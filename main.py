@@ -92,11 +92,20 @@ def namer(gamename):
     return name
 
 def backup(ftp, gamename):
-    name = namer(gamename)
-    zipped = name+'.zip'
-    zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(games[gamename]['extpath']))
-    ftpsend(ftp, zipped)
-    os.remove(zipped)
+    if gamename in ftp.nlst():
+        name = namer(gamename)
+        time = name[-10:]
+        ftp.cwd(gamename)
+        ftp.mkd(time)
+        ftp.cwd(time)
+        zipped = name+'.zip'
+        zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(games[gamename]['extpath']))
+        ftpsend(ftp, zipped)
+        os.remove(zipped)
+        return
+    else:
+        ftp.mkd(gamename)
+        backup(ftp, gamename)
 
 welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
 print(welcome)
