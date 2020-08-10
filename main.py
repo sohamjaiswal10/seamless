@@ -101,8 +101,10 @@ def backup(ftp, gamename):
             ftp.mkd(time)
             ftp.cwd(time)
         elif choice == 'y':
-            savename = input("Enter name for save: ")
+            savename = input("Enter name for save (Unique, else old one deleted/Overwrited): ")
             ftp.cwd(gamename)
+            if savename in ftp.nlst():
+                ftp.rmd(savename)
             ftp.mkd(savename)
             ftp.cwd(savename)
         zipped = name+'.zip'
@@ -115,13 +117,62 @@ def backup(ftp, gamename):
         ftp.mkd(gamename)
         backup(ftp, gamename)
 
-def restore(gamename, customsavename= None):
-    pass
+def load(gamename, customsavename = None):
+    if gamename in ftp.nlst():
+        ftp.cwd(gamename)
+        if customsavename:
+            if customsavename in ftp.nlst():
+                ftp.cwd(customsavename)
+                files = ftp.nlst()
+                for save in files:
+                    ftpget(ftp, save, save)
+            else:
+                print("Error custom save does NOT exist... please resume from start after confirming name!")
+        else:
+            print("Custom save name not provided!")
+            while True:
+                choice = input('''
+Enter choice:
+1) Load latest one available (Recommended)
+2) Browse yourself
+3) Go back to view other options
+                ''')
+                if choice == '1':
+                    dmod = 0
+                    kingfolder = ''
+                    for folder in ftp.nlst():
+                        mod = int(ftp.voidcmd(f"MDTM %s" %folder)[-14:])
+                        if mod >= dmod:
+                            dmod = mod
+                            kingfolder = folder
+                        else:
+                            continue
+                    if kingfolder != '':
+                        ftp.cwd(kingfolder)
+                        files = ftp.nlst()
+                        for file in files:
+                            ftpget(ftp,file,file)
+                            break
+                    else:
+                        print("SCHMARRTY!!! FOLDER WAS EMPTY!!! LULL")
+                        break
+                        
+                if choice == '2':
+                    print("This option is under construction!")
+                    break
+                if choice == '3':
+                    break
+                else:
+                    print("Invalid choice! please enter a number!")
+    else:
+        print("Saves of given game do NOT EXIST (DA FOQ) please resume from start after confirming name!")
+    
+
 
 welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
 print(welcome)
-#ftpsend(ftp, 'MINECRAFT1597049446.zip')
-backup(ftp, 'FALLOUT 3')
+#backup(ftp, 'MINECRAFT')
+load('MINECRAFT')
 #print(os.getcwd())
 #zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
 #str(os.getcwd()+'\\'+)

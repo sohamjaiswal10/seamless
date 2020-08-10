@@ -24,3 +24,10 @@ a path utilizing games ini and namer handles the nomenclature of saves.
 ================================5.5===========================================
 Tested satability of backerupper lol, got idea of custom savenames, so started 
 restorer as that as main feature...
+===============================END============================================
+
+==================================6===========================================
+You can get files from the ftp now (Technically), Still the important part of 
+putting the files back in the location where thay are supposed to be (OVERWRITING)
+remains but ig this much is enough for this commit, adding the feature in the next 
+one prolly
