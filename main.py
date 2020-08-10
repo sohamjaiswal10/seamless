@@ -3,10 +3,11 @@
 #MAY BE LOST IF YOU DO NOT KNOW WHAT YOU ARE DOING!
 
 #importing libraries which may be required...
-import os, sys
+import os, sys, time, threading, multiprocessing
 import zipfile, shutil
 from ftplib import FTP
 from configparser import ConfigParser
+import getpass
 
 #made an ftp object to connect to
 ftp = FTP()
@@ -18,13 +19,18 @@ openlist=[]
 #made a games configparser object to read specific profiles for games from games.ini
 games = ConfigParser()
 games.read('games.ini')
+gamelist = games.sections()
 
 #made a config configparser object to read configuration for ftp in config.ini
 config = ConfigParser()
 config.read('config.ini')
 
+#getting curent username for use in directories
+user = getpass.getuser()
+maindir = 'C:\\Users\\'+user
+
 #direct is the directory, out is the file
-def zipdir(direct, out): 
+def zipdir(out, direct): 
     shutil.make_archive(out, 'zip', direct)
 
 #to unzip saves, path is where the zip is, direct is where to save zip
@@ -51,26 +57,15 @@ def ftpget(ftp, filename, local):
 def ftpsend(ftp, filename):
     ftp.storbinary('STOR '+filename, open(filename, 'rb'))
 
-def typeensure(var,typ,num):
-    if num == 0:
-        try:
-            typ = typ(var)
-        except:
-            print("Sorry the type cannot be converted to what it's supposed to be... try again")
-            var = input(f"Enter the thing which will be convertible to %s type" %str(typ))
-            typeensure(var, typ, num+1)
-        finally:
-            return(typ)
-    else:
-        if num != 0:
-            try:
-                typ = typ(var)
-            except:
-                print("Sorry the type cannot be converted to what it's supposed to be... try again")
-                var = input(f"Enter the thing which will be convertible to %s type" %str(typ))
-                typeensure(var, typ, num+1)
-            finally:
-                return(typ)
+def typeensure(var,typ):
+    try:
+        typ = typ(var)
+    except:
+        print("Sorry the type cannot be converted to what it's supposed to be... try again")
+        var = input(f"Enter the thing which will be convertible to %s type" %str(typ))
+        typeensure(var, typ)
+    finally:
+        return(typ)
 
 def fin():
     if ftp.voidcmd("NOOP") and openlist[0]:
@@ -88,9 +83,25 @@ def fin():
     else:
         sys.exit()
 
-def backupall():
-    pass
+def pathparser(extpath):
+    path = maindir+'\\'+extpath
+    return path
 
-    
+def namer(gamename):
+    name = gamename + str(time.time())[0:10]
+    return name
 
-        
+def backup(ftp, gamename):
+    name = namer(gamename)
+    zipped = name+'.zip'
+    zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(games[gamename]['extpath']))
+    ftpsend(ftp, zipped)
+    os.remove(zipped)
+
+welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
+print(welcome)
+#ftpsend(ftp, 'MINECRAFT1597049446.zip')
+backup(ftp, 'MINECRAFT')
+#print(os.getcwd())
+#zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
+#str(os.getcwd()+'\\'+)

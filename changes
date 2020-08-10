@@ -9,3 +9,13 @@ added backupall function to main.py (just for show for now) and also finished
 the logic for the fin function in main.py and added some handy comments, 
 and made config.ini to store data about the ftp and the to be made database
 added info in README.md to refer to from config.ini
+================================END==========================================
+
+=================================5===========================================
+This was a difficult one to crack... Not difficult, i was stupid at times, added
+ability to backup shit while keeping the package as portable as i currently could
+next is gonna be ability to restore game saves, that will be easier as i just need
+to reverse the process, might also add a rudimentary interface. I wanted to make a
+temp directory to handle all the files related to transfer but ftplib kept giving an 
+error 550 SUPER ANNOYING. As a bonus added pathparser and namer to handle reaching 
+a path utilizing games ini and namer handles the nomenclature of saves.
