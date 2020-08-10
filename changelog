@@ -31,3 +31,11 @@ You can get files from the ftp now (Technically), Still the important part of
 putting the files back in the location where thay are supposed to be (OVERWRITING)
 remains but ig this much is enough for this commit, adding the feature in the next 
 one prolly
+==================================END=========================================
+
+===================================7==========================================
+Dispatcher function added which dispatches the saves to the location where they 
+should be and deletes the temporary transfer zip which previously would've remained
+in the cwd (Useless lil' pieces of shit) now the interface remains.... finally
+the basics of the backend are done at lucky change 7! Up next will be the interface 
+of all this shit.

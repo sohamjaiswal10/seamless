@@ -83,13 +83,17 @@ def fin():
     else:
         sys.exit()
 
-def pathparser(extpath):
+def pathparser(gamename):
+    extpath = games[gamename]['extpath']
     path = maindir+'\\'+extpath
     return path
 
 def namer(gamename):
     name = gamename + str(time.time())[0:10]
     return name
+
+def rev(string):
+    return(string[::-1])
 
 def backup(ftp, gamename):
     if gamename in ftp.nlst():
@@ -108,7 +112,7 @@ def backup(ftp, gamename):
             ftp.mkd(savename)
             ftp.cwd(savename)
         zipped = name+'.zip'
-        zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(games[gamename]['extpath']))
+        zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(gamename))
         ftpsend(ftp, zipped)
         os.remove(zipped)
         ftp.cwd('/')
@@ -167,12 +171,23 @@ Enter choice:
     else:
         print("Saves of given game do NOT EXIST (DA FOQ) please resume from start after confirming name!")
     
+def dispatcher():
+    count = 0
+    for filename in os.listdir():
+        if '.zip' in filename:
+            count+=1
+            gamename = rev(filename[-15::-1])
+            wannabepath = pathparser(gamename)
+            extract(filename, wannabepath)
+            os.remove(filename)
+    if count == 0:
+        print("No saves in directory!")
 
 
 welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
 print(welcome)
 #backup(ftp, 'MINECRAFT')
-load('MINECRAFT')
-#print(os.getcwd())
+#load('MINECRAFT')
+dispatcher()
 #zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
 #str(os.getcwd()+'\\'+)
