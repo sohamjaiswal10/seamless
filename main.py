@@ -130,6 +130,7 @@ def load(gamename, customsavename = None):
                 files = ftp.nlst()
                 for save in files:
                     ftpget(ftp, save, save)
+                ftp.cwd('/')
             else:
                 print("Error custom save does NOT exist... please resume from start after confirming name!")
         else:
@@ -157,6 +158,7 @@ Enter choice:
                         for file in files:
                             ftpget(ftp,file,file)
                             break
+                        ftp.cwd('/')
                     else:
                         print("SCHMARRTY!!! FOLDER WAS EMPTY!!! LULL")
                         break
