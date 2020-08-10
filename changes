@@ -19,3 +19,8 @@ to reverse the process, might also add a rudimentary interface. I wanted to make
 temp directory to handle all the files related to transfer but ftplib kept giving an 
 error 550 SUPER ANNOYING. As a bonus added pathparser and namer to handle reaching 
 a path utilizing games ini and namer handles the nomenclature of saves.
+==================================END=========================================
+
+================================5.5===========================================
+Tested satability of backerupper lol, got idea of custom savenames, so started 
+restorer as that as main feature...

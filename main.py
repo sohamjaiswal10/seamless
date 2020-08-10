@@ -94,23 +94,33 @@ def namer(gamename):
 def backup(ftp, gamename):
     if gamename in ftp.nlst():
         name = namer(gamename)
-        time = name[-10:]
-        ftp.cwd(gamename)
-        ftp.mkd(time)
-        ftp.cwd(time)
+        choice = input('''Enter custom save name y/n: ''')
+        if choice == 'n':
+            time = name[-10:]
+            ftp.cwd(gamename)
+            ftp.mkd(time)
+            ftp.cwd(time)
+        elif choice == 'y':
+            savename = input("Enter name for save: ")
+            ftp.cwd(gamename)
+            ftp.mkd(savename)
+            ftp.cwd(savename)
         zipped = name+'.zip'
         zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(games[gamename]['extpath']))
         ftpsend(ftp, zipped)
         os.remove(zipped)
+        ftp.cwd('/')
         return
     else:
         ftp.mkd(gamename)
         backup(ftp, gamename)
 
+
+
 welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
 print(welcome)
 #ftpsend(ftp, 'MINECRAFT1597049446.zip')
-backup(ftp, 'MINECRAFT')
+backup(ftp, 'FALLOUT 3')
 #print(os.getcwd())
 #zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
 #str(os.getcwd()+'\\'+)
