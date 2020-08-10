@@ -4,10 +4,12 @@
 
 #importing libraries which may be required...
 import os, sys, time, threading, multiprocessing
-import zipfile, shutil
+#import zipfile, shutil
 from ftplib import FTP
 from configparser import ConfigParser
 import getpass
+import archivetools as arch
+import misctools as misc
 
 #made an ftp object to connect to
 ftp = FTP()
@@ -29,15 +31,6 @@ config.read('config.ini')
 user = getpass.getuser()
 maindir = 'C:\\Users\\'+user
 
-#direct is the directory, out is the file
-def zipdir(out, direct): 
-    shutil.make_archive(out, 'zip', direct)
-
-#to unzip saves, path is where the zip is, direct is where to save zip
-def extract(path, direct): 
-    with zipfile.ZipFile(path, 'r') as zip_ref:
-        zip_ref.extractall(direct)
-
 #if u don't get this then u r unqualified to be here
 def ftpconn(host,port=21, usr='anonymous', pswd='',dir='/'):
     ftp.connect(host,port)
@@ -51,21 +44,13 @@ def ftpget(ftp, filename, local):
     file = open(local, 'wb')
     ftp.retrbinary('RETR ' + filename, file.write, 1024)
     file.close()
+    return
 
 #ftp is the ftp object created earlier
 #filename is the filename u r sending to the ftp
 def ftpsend(ftp, filename):
     ftp.storbinary('STOR '+filename, open(filename, 'rb'))
-
-def typeensure(var,typ):
-    try:
-        typ = typ(var)
-    except:
-        print("Sorry the type cannot be converted to what it's supposed to be... try again")
-        var = input(f"Enter the thing which will be convertible to %s type" %str(typ))
-        typeensure(var, typ)
-    finally:
-        return(typ)
+    return
 
 def fin():
     if ftp.voidcmd("NOOP") and openlist[0]:
@@ -88,16 +73,22 @@ def pathparser(gamename):
     path = maindir+'\\'+extpath
     return path
 
-def namer(gamename):
-    name = gamename + str(time.time())[0:10]
-    return name
+def envsetup():
+    if user in ftp.nlst():
+        ftp.cwd(user)
+        if 'saves' in ftp.nlst():
+            ftp.cwd('saves')
+        else:
+            ftp.mkd('saves')
+            ftp.cwd('saves')
+    else:
+        ftp.mkd(user)
+        envsetup()
 
-def rev(string):
-    return(string[::-1])
 
 def backup(ftp, gamename):
     if gamename in ftp.nlst():
-        name = namer(gamename)
+        name = misc.namer(gamename)
         choice = input('''Enter custom save name y/n: ''')
         if choice == 'n':
             time = name[-10:]
@@ -108,20 +99,20 @@ def backup(ftp, gamename):
             savename = input("Enter name for save (Unique, else old one deleted/Overwrited): ")
             ftp.cwd(gamename)
             if savename in ftp.nlst():
-                ftp.rmd(savename)
+                ftp.rmtree(savename)
             ftp.mkd(savename)
             ftp.cwd(savename)
         zipped = name+'.zip'
-        zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(gamename))
+        arch.zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(gamename))
         ftpsend(ftp, zipped)
         os.remove(zipped)
-        ftp.cwd('/')
+        ftp.cwd('/'+user+'/'+'saves')
         return
     else:
         ftp.mkd(gamename)
         backup(ftp, gamename)
 
-def load(gamename, customsavename = None):
+def load(ftp, gamename, customsavename = None):
     if gamename in ftp.nlst():
         ftp.cwd(gamename)
         if customsavename:
@@ -130,9 +121,11 @@ def load(gamename, customsavename = None):
                 files = ftp.nlst()
                 for save in files:
                     ftpget(ftp, save, save)
-                ftp.cwd('/')
+                ftp.cwd('/'+user+'/'+'saves')
+                return
             else:
                 print("Error custom save does NOT exist... please resume from start after confirming name!")
+                return
         else:
             print("Custom save name not provided!")
             while True:
@@ -141,7 +134,7 @@ Enter choice:
 1) Load latest one available (Recommended)
 2) Browse yourself
 3) Go back to view other options
-                ''')
+''')
                 if choice == '1':
                     dmod = 0
                     kingfolder = ''
@@ -158,38 +151,100 @@ Enter choice:
                         for file in files:
                             ftpget(ftp,file,file)
                             break
-                        ftp.cwd('/')
+                        ftp.cwd('/'+user+'/'+'saves')
+                        return
                     else:
                         print("SCHMARRTY!!! FOLDER WAS EMPTY!!! LULL")
-                        break
+                        return
                         
                 if choice == '2':
                     print("This option is under construction!")
-                    break
+                    return
                 if choice == '3':
-                    break
+                    return
                 else:
                     print("Invalid choice! please enter a number!")
     else:
         print("Saves of given game do NOT EXIST (DA FOQ) please resume from start after confirming name!")
-    
+        return
+
 def dispatcher():
     count = 0
     for filename in os.listdir():
         if '.zip' in filename:
             count+=1
-            gamename = rev(filename[-15::-1])
+            gamename = misc.rev(filename[-15::-1])
             wannabepath = pathparser(gamename)
-            extract(filename, wannabepath)
+            arch.extract(filename, wannabepath)
             os.remove(filename)
+            print("Dispatch Success!!")
+            return
     if count == 0:
         print("No saves in directory!")
-
-
-welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
-print(welcome)
+        return
+def interface():
+    while True:
+        mainchoice = input('''
+    1) Send NOOP to server
+    2) Game save/load menu
+    3) Exit (Safely)
+    ''')
+        if mainchoice == '1':
+            print(ftp.voidcmd("NOOP"))
+        elif mainchoice == '2':
+            while True:
+                choice = input('''
+    1) See the profiled games that can be saved from this device: 
+    2) Load a save game and put it in the correct dir
+    3) Main menu
+    ''')
+                if choice == '1':
+                    while True:
+                        for i in range(0,len(gamelist)-1):
+                            print(f"{i+1}) {gamelist[i]} ")
+                            print(f"{len(gamelist)+1}) Exit")
+                        savechoice = misc.typeensure((input("Enter number of the thing you want to backup: "), int))
+                        if savechoice in range(1,len(gamelist)+1):
+                            backup(ftp,gamelist[savechoice])
+                        elif savechoice == len(gamelist)+1:
+                            break
+                        else:
+                            print("Invalid Choice!")
+                if choice == '2':
+                    while True:
+                        for i in range(0,len(gamelist)-1):
+                            print(f"{i+1}) {gamelist[i]} ")
+                            print(f"{len(gamelist)+1}) Exit")
+                        savechoice = misc.typeensure((input("Enter number of the thing you want to load: "), int))
+                        while True:
+                            if savechoice in range(1,len(gamelist)+1):
+                                qsavename = input("If you had a savename and you remember it and you need it press 'y' otherwise 'n': ")
+                                if qsavename == 'y': 
+                                    savename == input("Enter savename: ")
+                                    load(ftp,gamelist[savechoice], savename)
+                                elif qsavename == 'n':
+                                    load(ftp,gamelist[savechoice])
+                                else:
+                                    print("Invalid choice! Enter y/n")
+                            elif savechoice == len(gamelist)+1:
+                                break
+                            else:
+                                print("Invalid Choice!")
+                if choice == '3':
+                    pass
+                else:
+                    print("Invalid choice!")
+        elif mainchoice == '3':
+            fin()
+        else:
+            print("Invalid Choice!")
+welcome = ftpconn(config['FTP']['host'], misc.typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
+print(welcome+'\n')
+envsetup()
+interface()
 #backup(ftp, 'MINECRAFT')
-#load('MINECRAFT')
-dispatcher()
+#load('MINECRAFT', "ultimate's")
+#dispatcher()
 #zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
 #str(os.getcwd()+'\\'+)
+print(gamelist)

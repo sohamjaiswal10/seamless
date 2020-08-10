@@ -39,3 +39,15 @@ should be and deletes the temporary transfer zip which previously would've remai
 in the cwd (Useless lil' pieces of shit) now the interface remains.... finally
 the basics of the backend are done at lucky change 7! Up next will be the interface 
 of all this shit.
+==================================END==========================================
+
+===================================8===========================================
+You guys must've thought I was done for today, huh? WRONG 4th major commit of today
+seperated archiving functions to a different module of it's own and made misctools
+module for well... misctools. AND created a sorta functional interface for noobs it's
+not tested yet but I am pretty sure it will work... also now there will be a seperate
+folder for every user with a different username on pc, m gonna make an override for it
+next, cuz while setting up an environment for what i am assuming to be different users
+might just be one and it will be a major pain in the butt if that person cant access
+his/her files (The shit this program is supposed to provide), thus the override feature
+is gonna be real important.
