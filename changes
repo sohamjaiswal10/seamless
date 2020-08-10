@@ -8,3 +8,4 @@ added changes to help me remember what I am changing.
 added backupall function to main.py (just for show for now) and also finished 
 the logic for the fin function in main.py and added some handy comments, 
 and made config.ini to store data about the ftp and the to be made database
+added info in README.md to refer to from config.ini
