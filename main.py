@@ -3,15 +3,25 @@
 #MAY BE LOST IF YOU DO NOT KNOW WHAT YOU ARE DOING!
 
 #importing libraries which may be required...
-import os
+import os, sys
 import zipfile, shutil
 from ftplib import FTP
 from configparser import ConfigParser
 
 #made an ftp object to connect to
-ftp = FTP() 
+ftp = FTP()
+
+#made an openlist list to keep track of open files, so that program closes safely
+#without corrupting anything
+openlist=[]
+
+#made a games configparser object to read specific profiles for games from games.ini
+games = ConfigParser()
+games.read('games.ini')
+
+#made a config configparser object to read configuration for ftp in config.ini
 config = ConfigParser()
-config.read('games.ini')
+config.read('config.ini')
 
 #direct is the directory, out is the file
 def zipdir(direct, out): 
@@ -27,6 +37,8 @@ def ftpconn(host,port=21, usr='anonymous', pswd='',dir='/'):
     ftp.connect(host,port)
     ftp.login(user=usr, passwd=pswd)
     return(ftp.getwelcome())
+
+#ftp is the ftp object created earlier
 #filename (str) is of the file which is to be got
 #local (open file object) is where it's data is saved.
 def ftpget(ftp, filename, local):
@@ -34,6 +46,8 @@ def ftpget(ftp, filename, local):
     ftp.retrbinary('RETR ' + filename, file.write, 1024)
     file.close()
 
+#ftp is the ftp object created earlier
+#filename is the filename u r sending to the ftp
 def ftpsend(ftp, filename):
     ftp.storbinary('STOR '+filename, open(filename, 'rb'))
 
@@ -59,8 +73,24 @@ def typeensure(var,typ,num):
                 return(typ)
 
 def fin():
-    if ftp.voidcmd("NOOP"):
+    if ftp.voidcmd("NOOP") and openlist[0]:
         ftp.close()
+        for file in openlist:
+            file.close()
+        sys.exit()
+    elif not ftp.voidcmd("NOOP") and openlist[0]:
+        for file in openlist:
+            file.close()
+        sys.exit()
+    elif ftp.voidcmd("NOOP") and not openlist[0]:
+        ftp.close()
+        sys.exit()
+    else:
+        sys.exit()
+
+def backupall():
+    pass
+
     
 
         
