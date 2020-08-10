@@ -115,7 +115,8 @@ def backup(ftp, gamename):
         ftp.mkd(gamename)
         backup(ftp, gamename)
 
-
+def restore(gamename, customsavename= None):
+    pass
 
 welcome = ftpconn(config['FTP']['host'], typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
 print(welcome)
