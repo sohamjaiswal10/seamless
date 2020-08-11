@@ -15,10 +15,6 @@ import misctools as misc
 #made an ftp object to connect to
 ftp = FTP()
 
-#made an openlist list to keep track of open files, so that program closes safely
-#without corrupting anything
-openlist=[]
-
 #made a games configparser object to read specific profiles for games from games.ini
 games = ConfigParser()
 games.read('games.ini')
@@ -74,17 +70,6 @@ def envsetup():
     else:
         ftp.mkd('saves')
         ftp.cwd('saves')
-#    if user in ftp.nlst():
-#        ftp.cwd(user)
-#        if 'saves' in ftp.nlst():
-#            ftp.cwd('saves')
-#        else:
-#            ftp.mkd('saves')
-#            ftp.cwd('saves')
-#    else:
-#        ftp.mkd(user)
-#        envsetup()
-
 
 def backup(ftp, gamename):
     if gamename in ftp.nlst():
