@@ -9,10 +9,10 @@ def rev(string):
 
 def typeensure(var,typ):
     try:
-        typ = typ(var)
-    except:
+        var = typ(var)
+    except ValueError:
         print("Sorry the type cannot be converted to what it's supposed to be... try again")
         var = input(f"Enter the thing which will be convertible to %s type" %str(typ))
         typeensure(var, typ)
     finally:
-        return(typ)
+        return(var)

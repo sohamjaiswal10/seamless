@@ -51,3 +51,6 @@ next, cuz while setting up an environment for what i am assuming to be different
 might just be one and it will be a major pain in the butt if that person cant access
 his/her files (The shit this program is supposed to provide), thus the override feature
 is gonna be real important.
+
+=====================================8.5==============================================
+Made it such that it does not crash without a connection from config.ini

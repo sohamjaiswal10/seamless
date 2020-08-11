@@ -6,6 +6,7 @@
 import os, sys, time, threading, multiprocessing
 #import zipfile, shutil
 from ftplib import FTP
+import ftplib
 from configparser import ConfigParser
 import getpass
 import archivetools as arch
@@ -26,6 +27,9 @@ gamelist = games.sections()
 #made a config configparser object to read configuration for ftp in config.ini
 config = ConfigParser()
 config.read('config.ini')
+
+#made a welcome object to be referenced when trying connection to ftp
+welcome = ''
 
 #getting curent username for use in directories
 user = getpass.getuser()
@@ -202,7 +206,7 @@ def interface():
                     while True:
                         for i in range(0,len(gamelist)-1):
                             print(f"{i+1}) {gamelist[i]} ")
-                            print(f"{len(gamelist)+1}) Exit")
+                        print(f"{len(gamelist)+1}) Exit")
                         savechoice = misc.typeensure((input("Enter number of the thing you want to backup: "), int))
                         if savechoice in range(1,len(gamelist)+1):
                             backup(ftp,gamelist[savechoice])
@@ -214,8 +218,8 @@ def interface():
                     while True:
                         for i in range(0,len(gamelist)-1):
                             print(f"{i+1}) {gamelist[i]} ")
-                            print(f"{len(gamelist)+1}) Exit")
-                        savechoice = misc.typeensure((input("Enter number of the thing you want to load: "), int))
+                        print(f"{len(gamelist)+1}) Exit")
+                        lolsavechoice = int(input("Enter number of the thing you want to load: "))
                         while True:
                             if savechoice in range(1,len(gamelist)+1):
                                 qsavename = input("If you had a savename and you remember it and you need it press 'y' otherwise 'n': ")
@@ -238,7 +242,27 @@ def interface():
             fin()
         else:
             print("Invalid Choice!")
-welcome = ftpconn(config['FTP']['host'], misc.typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
+def configconn():
+    global welcome
+    global ftplib
+    while False == bool(welcome):
+        try:
+            welcome = ftpconn(config['FTP']['host'], misc.typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
+            return welcome
+        except ftplib.all_errors as e:
+            print("An error occured in the connection...")
+            print("Sleeping 5 seconds then retrying... \n")
+            time.sleep(5)
+            configconn()
+
+#try:
+    #welcome = ftpconn(config['FTP']['host'], misc.typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
+#except ftplib.all_errors as e:
+    #print("An error occured in the connection...")
+    #print("Sleeping 5 seconds the retrying...")
+    #time.sleep(5)
+    #configconn()
+configconn()
 print(welcome+'\n')
 envsetup()
 interface()
@@ -247,4 +271,4 @@ interface()
 #dispatcher()
 #zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
 #str(os.getcwd()+'\\'+)
-print(gamelist)
+#print(gamelist)
