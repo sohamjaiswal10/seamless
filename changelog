@@ -56,10 +56,11 @@ is gonna be real important.
 Made it such that it does not crash without a connection from config.ini
 ====================================END===============================================
 
-=============================9: THE BUG CRUSHER UPDATE================================
+==========================9: THE BUG CRUSHER & CLEANUP UPDATE=========================
 Eliminated almost all bugs from interface. Still thinking about the ftp browser i had mentioned
 would be difficult to implement. Also, changed the folder structure from 
 user>saves>gamename>savefileto saves>gamename>savefile as the user folder can be managed 
 by the ftp server itself and this user stuff was overcomplicating stuff. Removed the openlist 
 thingy cuz the archivetools close the files themselves and u cannot reach the exit button 
-while shit is being processed so I realized that we did not need it.
+while shit is being processed so I realized that we did not need it. Also cleaned up some 
+old obsolete code which was in comments (Added some utterly useless but kinda fun comments too) 

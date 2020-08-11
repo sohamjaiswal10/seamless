@@ -1,6 +1,6 @@
 #PLEASE DO NOT MESS AROUND IF U DON'T KNOW WHAT YOU ARE DOING
-#YOU WILL BE HANDLING FILES OUTSIDE THE CWD, DATA ON THE 
-#MAY BE LOST IF YOU DO NOT KNOW WHAT YOU ARE DOING!
+#YOU WILL BE HANDLING FILES OUTSIDE THE CWD, DATA MAY BE LOST IF YOU DO NOT KNOW WHAT YOU ARE DOING!
+#==HAT-TRICK==#
 
 #importing libraries which may be required...
 import os, sys, time, threading, multiprocessing
@@ -97,6 +97,7 @@ def backup(ftp, gamename):
         os.remove(zipped)
         ftp.cwd('/'+'saves')
         return
+#===CENTURY ==#
     else:
         ftp.mkd(gamename)
         backup(ftp, gamename)
@@ -196,6 +197,7 @@ def interface():
                         if savechoice in range(1,len(gamelist)+1):
                             backup(ftp,gamelist[savechoice-1])
                         elif savechoice == len(gamelist)+1:
+#==DOUBLE-CENTURY==#
                             break
                         else:
                             print("Invalid Choice!")
@@ -233,6 +235,7 @@ def interface():
             fin()
         else:
             print("Invalid Choice!")
+
 def configconn():
     global welcome
     global ftplib
@@ -246,20 +249,8 @@ def configconn():
             time.sleep(5)
             configconn()
 
-#try:
-    #welcome = ftpconn(config['FTP']['host'], misc.typeensure(config['FTP']['port'], int), config['FTP']['user'], config['FTP']['password'])
-#except ftplib.all_errors as e:
-    #print("An error occured in the connection...")
-    #print("Sleeping 5 seconds the retrying...")
-    #time.sleep(5)
-    #configconn()
 configconn()
 print(welcome+'\n')
 envsetup()
 interface()
-#backup(ftp, 'MINECRAFT')
-#load('MINECRAFT', "ultimate's")
-#dispatcher()
-#zipdir(str(os.getcwd()+'\\'+'temp'+'\\'+'MCBKUP'+str(time.time())), pathparser(games['MINECRAFT']['extpath']))
-#str(os.getcwd()+'\\'+)
-#print(gamelist)
+
