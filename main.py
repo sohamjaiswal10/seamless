@@ -57,16 +57,7 @@ def ftpsend(ftp, filename):
     return
 
 def fin():
-    if ftp.voidcmd("NOOP") and openlist[0]:
-        ftp.close()
-        for file in openlist:
-            file.close()
-        sys.exit()
-    elif not ftp.voidcmd("NOOP") and openlist[0]:
-        for file in openlist:
-            file.close()
-        sys.exit()
-    elif ftp.voidcmd("NOOP") and not openlist[0]:
+    if ftp.voidcmd("NOOP"):
         ftp.close()
         sys.exit()
     else:
@@ -209,7 +200,7 @@ def interface():
                         print(f"{len(gamelist)+1}) Exit")
                         savechoice = misc.typeensure(input("Enter number of the thing you want to backup: "), int)
                         if savechoice in range(1,len(gamelist)+1):
-                            backup(ftp,gamelist[savechoice])
+                            backup(ftp,gamelist[savechoice-1])
                         elif savechoice == len(gamelist)+1:
                             break
                         else:
@@ -225,7 +216,7 @@ def interface():
                                 qsavename = input("If you had a savename and you remember it and you need it press 'y' otherwise 'n': ")
                                 if qsavename == 'y': 
                                     savename == input("Enter savename: ")
-                                    load(ftp,gamelist[savechoice], savename)
+                                    load(ftp,gamelist[savechoice-1], savename)
                                 elif qsavename == 'n':
                                     load(ftp,gamelist[savechoice])
                                 else:
@@ -235,7 +226,7 @@ def interface():
                             else:
                                 print("Invalid Choice!")
                 if choice == '3':
-                    pass
+                    break
                 else:
                     print("Invalid choice!")
         elif mainchoice == '3':
