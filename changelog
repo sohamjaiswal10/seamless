@@ -54,3 +54,10 @@ is gonna be real important.
 
 =====================================8.5==============================================
 Made it such that it does not crash without a connection from config.ini
+====================================END===============================================
+
+=============================9: THE BUG CRUSHER UPDATE================================
+Eliminated almost all bugs from interface. Still thinking about the ftp browser i had mentioned
+would be difficult to implement. Also, changed the folder structure from user>saves>gamename>savefile
+to saves>gamename>savefile as the user folder can be managed by the ftp server itself and this user stuff
+was overcomplicating stuff. 

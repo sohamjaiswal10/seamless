@@ -69,16 +69,21 @@ def pathparser(gamename):
     return path
 
 def envsetup():
-    if user in ftp.nlst():
-        ftp.cwd(user)
-        if 'saves' in ftp.nlst():
-            ftp.cwd('saves')
-        else:
-            ftp.mkd('saves')
-            ftp.cwd('saves')
+    if 'saves' in ftp.nlst():
+        ftp.cwd('saves')
     else:
-        ftp.mkd(user)
-        envsetup()
+        ftp.mkd('saves')
+        ftp.cwd('saves')
+#    if user in ftp.nlst():
+#        ftp.cwd(user)
+#        if 'saves' in ftp.nlst():
+#            ftp.cwd('saves')
+#        else:
+#            ftp.mkd('saves')
+#            ftp.cwd('saves')
+#    else:
+#        ftp.mkd(user)
+#        envsetup()
 
 
 def backup(ftp, gamename):
@@ -94,14 +99,18 @@ def backup(ftp, gamename):
             savename = input("Enter name for save (Unique, else old one deleted/Overwrited): ")
             ftp.cwd(gamename)
             if savename in ftp.nlst():
-                ftp.rmtree(savename)
+                ftp.cwd(savename)
+                for filename in ftp.nlst():
+                    ftp.delete(filename)
+                ftp.cwd('..')
+                ftp.rmd(savename)
             ftp.mkd(savename)
             ftp.cwd(savename)
         zipped = name+'.zip'
         arch.zipdir(str(os.getcwd()+'\\'+'\\'+name), pathparser(gamename))
         ftpsend(ftp, zipped)
         os.remove(zipped)
-        ftp.cwd('/'+user+'/'+'saves')
+        ftp.cwd('/'+'saves')
         return
     else:
         ftp.mkd(gamename)
@@ -116,7 +125,7 @@ def load(ftp, gamename, customsavename = None):
                 files = ftp.nlst()
                 for save in files:
                     ftpget(ftp, save, save)
-                ftp.cwd('/'+user+'/'+'saves')
+                ftp.cwd('/'+'saves')
                 return
             else:
                 print("Error custom save does NOT exist... please resume from start after confirming name!")
@@ -146,7 +155,7 @@ Enter choice:
                         for file in files:
                             ftpget(ftp,file,file)
                             break
-                        ftp.cwd('/'+user+'/'+'saves')
+                        ftp.cwd('/'+'saves')
                         return
                     else:
                         print("SCHMARRTY!!! FOLDER WAS EMPTY!!! LULL")
@@ -195,7 +204,7 @@ def interface():
     ''')
                 if choice == '1':
                     while True:
-                        for i in range(0,len(gamelist)-1):
+                        for i in range(0,len(gamelist)):
                             print(f"{i+1}) {gamelist[i]} ")
                         print(f"{len(gamelist)+1}) Exit")
                         savechoice = misc.typeensure(input("Enter number of the thing you want to backup: "), int)
@@ -207,22 +216,28 @@ def interface():
                             print("Invalid Choice!")
                 if choice == '2':
                     while True:
-                        for i in range(0,len(gamelist)-1):
+                        for i in range(0,len(gamelist)):
                             print(f"{i+1}) {gamelist[i]} ")
                         print(f"{len(gamelist)+1}) Exit")
                         savechoice = misc.typeensure(input("Enter number of the thing you want to load: "), int)
-                        while True:
-                            if savechoice in range(1,len(gamelist)+1):
+                        if savechoice == len(gamelist)+1:
+                                break
+                        elif savechoice in range(1,len(gamelist)):
+                            while True:
                                 qsavename = input("If you had a savename and you remember it and you need it press 'y' otherwise 'n': ")
                                 if qsavename == 'y': 
-                                    savename == input("Enter savename: ")
+                                    savename = input("Enter savename: ")
                                     load(ftp,gamelist[savechoice-1], savename)
+                                    dispatcher()
+                                    print("Restored")
+                                    break
                                 elif qsavename == 'n':
                                     load(ftp,gamelist[savechoice])
+                                    dispatcher()
+                                    print("Restored")
+                                    break
                                 else:
                                     print("Invalid choice! Enter y/n")
-                            elif savechoice == len(gamelist)+1:
-                                break
                             else:
                                 print("Invalid Choice!")
                 if choice == '3':
