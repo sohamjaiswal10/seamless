@@ -207,7 +207,7 @@ def interface():
                         for i in range(0,len(gamelist)-1):
                             print(f"{i+1}) {gamelist[i]} ")
                         print(f"{len(gamelist)+1}) Exit")
-                        savechoice = misc.typeensure((input("Enter number of the thing you want to backup: "), int))
+                        savechoice = misc.typeensure(input("Enter number of the thing you want to backup: "), int)
                         if savechoice in range(1,len(gamelist)+1):
                             backup(ftp,gamelist[savechoice])
                         elif savechoice == len(gamelist)+1:
@@ -219,7 +219,7 @@ def interface():
                         for i in range(0,len(gamelist)-1):
                             print(f"{i+1}) {gamelist[i]} ")
                         print(f"{len(gamelist)+1}) Exit")
-                        lolsavechoice = int(input("Enter number of the thing you want to load: "))
+                        savechoice = misc.typeensure(input("Enter number of the thing you want to load: "), int)
                         while True:
                             if savechoice in range(1,len(gamelist)+1):
                                 qsavename = input("If you had a savename and you remember it and you need it press 'y' otherwise 'n': ")
